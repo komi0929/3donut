@@ -299,9 +299,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }, [onClear, onParticle, onShake]);
 
   const handleSwap = async (r1: number, c1: number, r2: number, c2: number) => {
-    setIsProcessing(true);
+    // 即座にUI更新（isProcessingを最初に設定しない）
     setSelectedPos(null);
-    setDragOffset(null); // Clear drag offset immediately to snap
+    setDragOffset(null);
     
     soundManager.init();
     soundManager.playSwap();
@@ -321,7 +321,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     const otherCell = rainbowCell === cell1 ? cell2 : cell1;
 
     if (rainbowCell && otherCell) {
-       await new Promise(r => setTimeout(r, 300));
+       setIsProcessing(true);
+       await new Promise(r => setTimeout(r, 150));
        soundManager.playFeverStart();
        
        const targetType = otherCell.type;
@@ -337,11 +338,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           });
        }
 
-       setIsProcessing(true);
        const flashGrid = newGrid.map(cell => ({ ...cell, isMatched: matchedIds.has(cell.id) }));
        setGrid(flashGrid);
        
-       await new Promise(r => setTimeout(r, 500));
+       await new Promise(r => setTimeout(r, 300));
        
        onClear(matchedIds.size, 0);
        
@@ -371,21 +371,19 @@ export const GameBoard: React.FC<GameBoardProps> = ({
        await new Promise(r => setTimeout(r, 20));
        const afterFallGrid = nextGrid.map(cell => ({ ...cell, visualRow: cell.row }));
        setGrid(afterFallGrid);
-       await new Promise(r => setTimeout(r, 200)); // Faster fall processing
+       await new Promise(r => setTimeout(r, 150));
        
        processBoard(afterFallGrid);
        return;
     }
 
-    await new Promise(r => setTimeout(r, 150));
-
+    // 通常スワップ: 待機なしで即座にマッチ判定
     const { matched } = analyzeMatches(newGrid);
     if (matched.size > 0) {
+      setIsProcessing(true);
       processBoard(newGrid);
-    } else {
-      // Free movement permitted
-      setIsProcessing(false);
     }
+    // マッチなしの場合はisProcessingを設定しない→次のスワイプ即可能
   };
 
   const activateSpecial = (cell: EnhancedCell) => {

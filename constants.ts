@@ -23,9 +23,9 @@ export const DONUT_COLORS = {
 };
 
 export const SPECIAL_SPAWN_RATES = {
-  RAINBOW: 0.001,
-  GOLD:    0.01,
-  SILVER:  0.02,
+  RAINBOW: 0.002,  // 10ゲームに1回
+  GOLD:    0.004,  // 5ゲームに1回
+  SILVER:  0.007,  // 3ゲームに1回
 };
 
 export const DONUT_PROMPTS = {

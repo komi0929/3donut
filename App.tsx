@@ -21,7 +21,7 @@ const App: React.FC = () => {
 
   // Timer states
   const [timeLeft, setTimeLeft] = useState<number>(TIME_LIMIT);
-  const [startTime, setStartTime] = useState<number>(0);
+  const startTimeRef = useRef<number>(0);
   const [finalTime, setFinalTime] = useState<number>(0);
   
   // Effects layer ref
@@ -112,7 +112,7 @@ const App: React.FC = () => {
     setFeverValue(0);
     setIsFever(false);
     setTimeLeft(TIME_LIMIT);
-    setStartTime(Date.now());
+    startTimeRef.current = Date.now();
     setFinalTime(0);
     setGameState(GameState.PLAYING);
   };
@@ -135,14 +135,14 @@ const App: React.FC = () => {
         const newCount = prev + count;
         if (newCount >= TARGET_CLEARS && gameState === GameState.PLAYING) {
              const endTime = Date.now();
-             setFinalTime((endTime - startTime) / 1000);
+             setFinalTime((endTime - startTimeRef.current) / 1000);
              // 勝利サウンド再生
              soundManager.playWin();
              setTimeout(() => setGameState(GameState.WIN), 500);
         }
         return newCount;
     });
-  }, [gameState, startTime, isFever]);
+  }, [gameState, isFever]);
 
   // パーティクル発生ハンドラ
   const handleParticle = useCallback((x: number, y: number, color: string, count?: number) => {

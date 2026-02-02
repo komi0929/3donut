@@ -23,9 +23,9 @@ export const DONUT_COLORS = {
 };
 
 export const SPECIAL_SPAWN_RATES = {
-  RAINBOW: 0.11, // High rate for debug
-  GOLD:    0.11, // High rate for debug
-  SILVER:  0.11, // High rate for debug
+  RAINBOW: 0.001,
+  GOLD:    0.01,
+  SILVER:  0.02,
 };
 
 export const DONUT_PROMPTS = {

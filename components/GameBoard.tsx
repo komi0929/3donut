@@ -296,6 +296,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handleSwap = async (r1: number, c1: number, r2: number, c2: number) => {
     setIsProcessing(true);
     setSelectedPos(null);
+    setDragOffset(null); // Clear drag offset immediately to snap
     
     soundManager.init();
     soundManager.playSwap();
@@ -365,7 +366,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
        await new Promise(r => setTimeout(r, 20));
        const afterFallGrid = nextGrid.map(cell => ({ ...cell, visualRow: cell.row }));
        setGrid(afterFallGrid);
-       await new Promise(r => setTimeout(r, 250));
+       await new Promise(r => setTimeout(r, 200)); // Faster fall processing
        
        processBoard(afterFallGrid);
        return;
@@ -377,9 +378,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     if (matched.size > 0) {
       processBoard(newGrid);
     } else {
-      // Free movement: Even if no match, the swap is valid.
-      // Just stop processing state so user can move again.
-      // Sound cue for "move" without match could be different, but for now we just accept it.
+      // Free movement permitted
       setIsProcessing(false);
     }
   };
@@ -483,14 +482,19 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     const afterFallGrid = nextGrid.map(cell => ({ ...cell, visualRow: cell.row }));
     setGrid(afterFallGrid);
     
-    await new Promise(r => setTimeout(r, 250));
+    await new Promise(r => setTimeout(r, 200)); // Optimize fall delay
     processBoard(afterFallGrid);
   };
 
+  // Continuous Drag Logic
   const handlePointerDown = (e: React.PointerEvent, r: number, c: number) => {
-    if (isProcessing || !isInteractable) return;
-    e.preventDefault();
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    // Allow interaction even during settling, but maybe not during big explosions if critical
+    // For "crisp" feel, we try to allow it.
+    if (!isInteractable) return;
+    
+    const target = e.currentTarget as HTMLElement;
+    target.setPointerCapture(e.pointerId); 
+    
     setSelectedPos({ row: r, col: c });
     dragRef.current = { startR: r, startC: c, startX: e.clientX, startY: e.clientY };
     tapRef.current = { startR: r, startC: c, startTime: Date.now() };
@@ -502,20 +506,25 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
+    
     if (tapRef.current && !isProcessing) {
        const { startR, startC, startTime } = tapRef.current;
        const duration = Date.now() - startTime;
        const dist = Math.sqrt(Math.pow(e.clientX - (dragRef.current?.startX || 0), 2) + Math.pow(e.clientY - (dragRef.current?.startY || 0), 2));
        
-       // Tap Detection: Short duration (<300ms) and little movement (<10px)
        if (duration < 300 && dist < 10) {
            const cell = grid.find(c => c.row === startR && c.col === startC);
            if (cell && (cell.type === DonutType.GOLD || cell.type === DonutType.SILVER || cell.type === DonutType.RAINBOW)) {
                activateSpecial(cell);
                setSelectedPos(null);
+               setDragOffset(null);
+               dragRef.current = null;
+               tapRef.current = null;
+               return; 
            }
        }
     }
+    
     setDragOffset(null);
     setSelectedPos(null);
     dragRef.current = null;
@@ -523,30 +532,65 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current || isProcessing) return;
+    if (!dragRef.current) return;
+    // NOTE: Removed isProcessing check to allow "queueing" or "continuous input" feeling
+    // Ideally we should block *only* if the board is falling, but for now let's try maximum responsiveness
+    // If user creates a match, handleSwap will trigger processBoard -> isProcessing=true
+    
     const { startR, startC, startX, startY } = dragRef.current;
     
     const moveX = e.clientX - startX;
     const moveY = e.clientY - startY;
     
-    // Real-time visual feedback using requestAnimationFrame
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(() => {
       setDragOffset({ x: moveX, y: moveY });
     });
     
-    // Swap threshold (30px for smoother feel)
-    const swapThreshold = 30;
+    // Dynamic threshold based on cell size (approx 55% of cell width)
+    // GRID_SIZE is 7. On mobile (375px), cell is ~48px. 55% is ~26px.
+    // On Desktop (1920px), cell is ~246px. 55% is ~135px.
+    const containerWidth = Math.min(window.innerWidth * 0.9, 500); // Max width constrained by CSS
+    const cellPx = containerWidth / GRID_SIZE;
+    const swapThreshold = Math.max(30, cellPx * 0.55); 
+    
     if (Math.abs(moveX) > swapThreshold || Math.abs(moveY) > swapThreshold) {
       let tr = startR, tc = startC;
-      if (Math.abs(moveX) > Math.abs(moveY)) tc = moveX > 0 ? startC + 1 : startC - 1;
-      else tr = moveY > 0 ? startR + 1 : startR - 1;
+      
+      // Determine direction
+      if (Math.abs(moveX) > Math.abs(moveY)) {
+          tc = moveX > 0 ? startC + 1 : startC - 1;
+      } else {
+          tr = moveY > 0 ? startR + 1 : startR - 1;
+      }
 
       if (tr >= 0 && tr < GRID_SIZE && tc >= 0 && tc < GRID_SIZE) {
-        setDragOffset(null);
-        dragRef.current = null;
-        tapRef.current = null;
+        // CONTINUOUS DRAG IMPL:
+        // Instead of resetting dragRef, we UPDATE it to the new cell's position.
+        // This simulates "finger still down, now managing the new cell".
+        
+        // 1. Execute Swap
         handleSwap(startR, startC, tr, tc);
+        
+        // 2. Update Ref to track from the NEW geometric center (approximate)
+        // actually we just shift the startX/Y so the dragOffset resets effectively relative to new cell
+        // New startR/C becomes the cell we just moved TO (which is now occupied by our original donut)
+        // Wait... after swap, does (tr, tc) contain the original donut? 
+        // handleSwap swaps grid data. So grid[tr][tc] is now the donut we started with.
+        
+        dragRef.current = { 
+            startR: tr, 
+            startC: tc, 
+            startX: e.clientX, 
+            startY: e.clientY 
+        };
+        
+        // 3. Reset visual offset because we logically moved the base pointer
+        setDragOffset({ x: 0, y: 0 });
+        setSelectedPos({ row: tr, col: tc }); // Update highlighting to follow the donut
+        
+        // Prevent Tap detection after a move
+        tapRef.current = null;
       }
     }
   };
@@ -556,8 +600,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   return (
     <div className="relative w-full max-w-[min(90vw,500px)] aspect-square bg-[#FFE4C4]/60 rounded-[2.5rem] p-3 shadow-2xl border-[8px] border-white overflow-hidden mx-auto touch-none select-none"
          onPointerMove={handlePointerMove}
-         onPointerUp={handlePointerUp} // Use unified up handler
-         onPointerLeave={() => { dragRef.current = null; tapRef.current = null; }}>
+         onPointerUp={handlePointerUp} 
+         onPointerLeave={() => { 
+             setDragOffset(null);
+             setSelectedPos(null);
+             dragRef.current = null;
+         }}>
       
       {comboTexts.map(t => (
         <div key={t.id} className="combo-text font-black text-[#FF6347] italic text-3xl"
@@ -568,12 +616,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         const isSelected = selectedPos?.row === cell.row && selectedPos?.col === cell.col;
         const isDragging = isSelected && dragOffset !== null;
         
-        // Calculate drag transform for smooth movement
         let dragTransform = '';
         if (isDragging && dragOffset) {
           dragTransform = `translate3d(${dragOffset.x}px, ${dragOffset.y}px, 0)`;
         } else if (isSelected) {
-          dragTransform = 'scale(1.1) translate3d(0,-8px,0)';
+          dragTransform = 'scale(1.1) translate3d(0,-8px,0)'; // Pop effect
         } else {
           dragTransform = 'scale(1) translate3d(0,0,0)';
         }

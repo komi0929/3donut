@@ -159,18 +159,16 @@ const App: React.FC = () => {
         {/* HERO SECTION: Logo & Title */}
         <div className="flex-1 flex flex-col justify-center items-center w-full min-h-[40vh]">
             <img 
-                src="/logo_v4.png" 
+                src="/logo_v8.png" 
                 alt="3DONUT" 
                 className="w-[90%] drop-shadow-2xl animate-poyon object-contain mx-auto" 
             />
             
             {/* Catchcopy / Description */}
             <div className="mt-8 space-y-2">
-                <h2 className="text-white font-black text-2xl tracking-widest drop-shadow-md font-['M_PLUS_Rounded_1c'] text-shadow-outline">
-                    モチモチパズル
-                </h2>
-                <p className="text-white font-bold text-lg drop-shadow-sm opacity-90">
-                    ドーナツを3つ並べて消そう！
+
+                <p className="text-white font-bold text-lg drop-shadow-sm opacity-90 whitespace-pre-wrap leading-relaxed">
+                    同じドーナツを3つ並べて{'\n'}どんどん消していこう！！
                 </p>
             </div>
         </div>
@@ -179,16 +177,10 @@ const App: React.FC = () => {
         <div className="w-full px-12 pt-8 pointer-events-auto flex justify-center">
             <button
                 onClick={startGame}
-                className="group relative w-full max-w-[260px] transition-transform duration-200 active:scale-95"
+                className="btn-clay btn-clay-strawberry w-full max-w-[260px] text-4xl py-6 transition-transform duration-200 active:scale-95 animate-poyon-delay"
             >
-                {/* Shadow */}
-                <div className="absolute inset-x-6 bottom-[-12px] h-6 bg-black/20 rounded-[100%] blur-md" />
-                
-                <img 
-                    src="/ui_btn_start.png" 
-                    alt="START" 
-                    className="relative w-full drop-shadow-xl object-contain animate-poyon-delay" 
-                />
+                <Play className="w-10 h-10 mr-2" fill="white" />
+                START
             </button>
         </div>
     </div>
@@ -285,18 +277,20 @@ const App: React.FC = () => {
                       {/* Action Buttons */}
                       <div className="px-6 space-y-3">
                           {/* Retry Button - Orange like TOP page */}
+                          {/* Retry Button - Clay Orange */}
                           <button 
                               onClick={startGame}
-                              className="w-full bg-gradient-to-b from-[#FFB347] to-[#FF8C00] hover:from-[#FFC56B] hover:to-[#FFA500] text-white font-black text-lg py-4 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
+                              className="btn-clay btn-clay-orange w-full text-xl py-4 flex items-center justify-center gap-2"
                           >
-                              <RotateCcw className="w-5 h-5" strokeWidth={3} />
+                              <RotateCcw className="w-6 h-6" strokeWidth={3} />
                               <span>もう一度</span>
                           </button>
                           
                           {/* Home Button */}
+                          {/* Home Button - Clay White/Vanilla */}
                           <button 
                               onClick={() => setGameState(GameState.INIT)}
-                              className="w-full bg-white hover:bg-gray-50 text-gray-500 font-bold text-base py-3 rounded-xl shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 border border-gray-200"
+                              className="btn-clay btn-clay-vanilla w-full text-gray-500 text-lg py-3 flex items-center justify-center gap-2 border-2 border-transparent hover:border-gray-200"
                           >
                               <span>🏠</span>
                               <span>TOPに戻る</span>

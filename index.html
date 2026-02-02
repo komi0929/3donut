@@ -113,6 +113,54 @@
         font-family: "M PLUS Rounded 1c", sans-serif;
       }
 
+      /* Clay Button Styles */
+      .btn-clay {
+        border: none;
+        border-radius: 1.5rem; /* Slightly rounded but distinct */
+        font-family: "M PLUS Rounded 1c", sans-serif;
+        font-weight: 900;
+        color: white;
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        
+        /* Clay Effect - Enhanced for Dough/Clay feel */
+        box-shadow: 
+          inset -0.3em -0.3em 0.5em rgba(0,0,0,0.1), /* Deep inner shadow */
+          inset 0.3em 0.3em 0.5em rgba(255,255,255,0.7), /* Bright highlight */
+          0.2em 0.3em 0.6em rgba(0,0,0,0.2); /* Soft drop shadow */
+      }
+      
+      .btn-clay:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 
+          inset -0.3em -0.3em 0.6em rgba(0,0,0,0.15),
+          inset 0.3em 0.3em 0.6em rgba(255,255,255,0.8),
+          0.3em 0.5em 1em rgba(0,0,0,0.25);
+      }
+
+      .btn-clay:active {
+        transform: translateY(1px) scale(0.98);
+        box-shadow: 
+          inset 0.2em 0.2em 0.5em rgba(0,0,0,0.15),
+          inset -0.1em -0.1em 0.3em rgba(255,255,255,0.3),
+          0.1em 0.1em 0.2em rgba(0,0,0,0.1);
+      }
+
+      /* Color Variants based on Donut Flavors */
+      .btn-clay-strawberry { background-color: #FF9EAA; } 
+      .btn-clay-soda { background-color: #87CEEB; }
+      .btn-clay-lemon { background-color: #FFD700; color: #5D4037; } /* text-dark for yellow */
+      .btn-clay-matcha { background-color: #aecb4e; }
+      .btn-clay-chocolate { background-color: #795548; }
+      .btn-clay-vanilla { background-color: #F5F5F5; color: #5D4037; }
+      .btn-clay-orange { background-color: #FFB347; } /* For retry buttons */
+
       .clay-texture::after {
         content: "";
         position: absolute;

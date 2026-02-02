@@ -552,12 +552,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       setDragOffset({ x: moveX, y: moveY });
     });
     
-    // Dynamic threshold based on cell size (approx 55% of cell width)
-    // GRID_SIZE is 7. On mobile (375px), cell is ~48px. 55% is ~26px.
-    // On Desktop (1920px), cell is ~246px. 55% is ~135px.
-    const containerWidth = Math.min(window.innerWidth * 0.9, 500); // Max width constrained by CSS
+    // Dynamic threshold based on cell size
+    // モバイル優先: 低い閾値で素早く反応
+    const containerWidth = Math.min(window.innerWidth * 0.9, 500);
     const cellPx = containerWidth / GRID_SIZE;
-    const swapThreshold = Math.max(30, cellPx * 0.55); 
+    const swapThreshold = Math.max(15, cellPx * 0.25); // 15px最小、セル幅の25% 
     
     if (Math.abs(moveX) > swapThreshold || Math.abs(moveY) > swapThreshold) {
       let tr = startR, tc = startC;

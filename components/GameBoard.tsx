@@ -647,11 +647,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               height: `${cellSize}%`,
               left: `${cell.col * cellSize}%`,
               top: `${cell.visualRow * cellSize}%`,
+              // ぼよんと弾む bouncy transition
               transition: hasMergeOffset 
-                ? 'transform 0.25s ease-out, opacity 0.2s ease-out 0.15s' 
-                : (isDragging ? 'none' : (isProcessing ? 'top 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.15s ease-in-out' : 'none')),
+                ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease-out 0.25s' 
+                : (isDragging ? 'none' : (isProcessing 
+                  ? 'top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)' 
+                  : 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)')),
               zIndex: isSelected || hasMergeOffset ? 100 : 10,
-              opacity: cell.isMatched ? (hasMergeOffset ? 1 : 0) : 1,
+              // mergeOffsetがある間は完全に見える、爆発後にフェードアウト
+              opacity: hasMergeOffset ? 1 : (cell.isMatched ? 0 : 1),
               transform: dragTransform,
               willChange: isDragging || hasMergeOffset ? 'transform, opacity' : 'auto',
               cursor: isDragging ? 'grabbing' : 'grab',

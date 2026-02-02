@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const INPUT = 'C:/Users/hisak/.gemini/antigravity/brain/ed8da7f4-1ee8-4bbd-9276-cc4cf2b770df/logo_decorated_v1_1770010267787.png';
+const INPUT = 'C:/Users/hisak/.gemini/antigravity/brain/ed8da7f4-1ee8-4bbd-9276-cc4cf2b770df/logo_no_shadow_v1_1770010586687.png';
 const OUTPUT = path.join(__dirname, '..', 'public', 'logo_v4.png');
 
 // Target background color: #87CEEB = RGB(135, 206, 235)

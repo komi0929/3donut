@@ -263,8 +263,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         setTimeout(() => setComboTexts(prev => prev.filter(t => t.id !== cid)), 500);
       }
 
-      // マージアニメーション時間を確保
-      await new Promise(r => setTimeout(r, 300));
+      // マージアニメーション時間（集合）
+      await new Promise(r => setTimeout(r, 350));
+      
+      // 爆発演出: スケールアップしてから消える
+      workingGrid = workingGrid.map(cell => {
+        if (finalMatchedIds.has(cell.id)) {
+          return { ...cell, mergeOffset: { x: 0, y: 0 } }; // 中央に戻しつつ爆発
+        }
+        return cell;
+      });
+      setGrid(workingGrid);
+      
+      // 爆発の余韻
+      await new Promise(r => setTimeout(r, 150));
 
       const bombCells = new Set<string>();
       const newGridState = [...workingGrid];
@@ -613,8 +625,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         if (isDragging && dragOffset) {
           dragTransform = `translate3d(${dragOffset.x}px, ${dragOffset.y}px, 0)`;
         } else if (hasMergeOffset) {
-          // ぷよぷよ風: 中央に集まって膨らむ
-          dragTransform = `translate(${cell.mergeOffset!.x}px, ${cell.mergeOffset!.y}px) scale(1.3)`;
+          // ぷよぷよ風: 集合してから爆発
+          const isExploding = cell.mergeOffset!.x === 0 && cell.mergeOffset!.y === 0;
+          if (isExploding) {
+            dragTransform = 'scale(1.8)'; // 爆発時に大きく膨らむ
+          } else {
+            dragTransform = `translate(${cell.mergeOffset!.x}px, ${cell.mergeOffset!.y}px) scale(1.2)`;
+          }
         } else if (isSelected) {
           dragTransform = 'scale(1.1) translate3d(0,-8px,0)';
         } else {

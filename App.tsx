@@ -85,7 +85,10 @@ const App: React.FC = () => {
 
   // Urgency Logic: 0 (Safe), 1 (Caution: <10s), 2 (Danger: <5s)
   // 背景色: 通常(青) -> 注意(オレンジ/紫) -> 危険(赤/黒)
-  const urgencyLevel = timeLeft <= 5 ? 2 : (timeLeft <= 15 ? 1 : 0);
+  // PLAYING状態以外ではurgencyLevelを0にリセット
+  const urgencyLevel = gameState === GameState.PLAYING 
+    ? (timeLeft <= 5 ? 2 : (timeLeft <= 15 ? 1 : 0))
+    : 0;
   
   const getBackgroundColor = () => {
     if (urgencyLevel === 2) return `linear-gradient(to bottom, #330000 0%, #cc0000 100%)`;

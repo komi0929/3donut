@@ -30,6 +30,17 @@ const COMBO_PHRASES = ["YUMMY!", "MOCHI!", "OISHI!", "GREAT!", "WOW!", "AMAZING!
 
 import { SPECIAL_SPAWN_RATES } from '../constants';
 
+// 通常ドーナツのみ生成（初期グリッド用）
+const NORMAL_TYPES = [
+  DonutType.STRAWBERRY, DonutType.VANILLA, DonutType.LEMON, 
+  DonutType.CHOCOLATE, DonutType.MATCHA, DonutType.SODA
+];
+
+const generateNormalType = () => {
+  return NORMAL_TYPES[Math.floor(Math.random() * NORMAL_TYPES.length)];
+};
+
+// レアドーナツを含む生成（ゲーム中の補充用）
 const generateRandomType = () => {
   const rand = Math.random();
   const rates = SPECIAL_SPAWN_RATES;
@@ -39,11 +50,7 @@ const generateRandomType = () => {
   if (rand < rates.RAINBOW + rates.GOLD) return DonutType.GOLD;
   if (rand < rates.RAINBOW + rates.GOLD + rates.SILVER) return DonutType.SILVER;
 
-  const normalTypes = [
-    DonutType.STRAWBERRY, DonutType.VANILLA, DonutType.LEMON, 
-    DonutType.CHOCOLATE, DonutType.MATCHA, DonutType.SODA
-  ];
-  return normalTypes[Math.floor(Math.random() * normalTypes.length)];
+  return NORMAL_TYPES[Math.floor(Math.random() * NORMAL_TYPES.length)];
 };
 
 export const GameBoard: React.FC<GameBoardProps> = ({ 
@@ -64,17 +71,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     let initialGrid: EnhancedCell[] = [];
     for (let r = 0; r < GRID_SIZE; r++) {
       for (let c = 0; c < GRID_SIZE; c++) {
-        // Initial generation avoiding immediate matches for Normal types
-        let type = generateRandomType();
-        // Retry logic only for normal types to avoid initial match-3, special donuts OK
+        // 初期生成時は通常ドーナツのみ（レアは出さない）
+        let type = generateNormalType();
+        // マッチ回避のリトライ
         let attempts = 0;
         while (attempts < 10 && (
-           type !== DonutType.RAINBOW && type !== DonutType.GOLD && type !== DonutType.SILVER
-        ) && (
           (c >= 2 && initialGrid.find(cell => cell.row === r && cell.col === c-1)?.type === type && initialGrid.find(cell => cell.row === r && cell.col === c-2)?.type === type) ||
           (r >= 2 && initialGrid.find(cell => cell.row === r-1 && cell.col === c)?.type === type && initialGrid.find(cell => cell.row === r-2 && cell.col === c)?.type === type)
         )) {
-          type = generateRandomType();
+          type = generateNormalType();
           attempts++;
         }
         initialGrid.push({ id: uuidv4(), type, isMatched: false, row: r, col: c, visualRow: r, special: 'NONE' });

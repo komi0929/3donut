@@ -199,11 +199,6 @@ const App: React.FC = () => {
       {/* Effects Canvas Layer */}
       <EffectsLayer ref={effectsRef} onShakeChange={setIsShaking} />
 
-      {/* Fever Gauge */}
-      {gameState === GameState.PLAYING && (
-          <FeverGauge value={feverValue} isActive={isFever} />
-      )}
-
       {/* HUD */}
       {gameState === GameState.PLAYING && (
         <header className="absolute top-4 left-0 right-0 px-6 z-20 pointer-events-none">

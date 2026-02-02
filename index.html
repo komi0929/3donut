@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>3DONUT - Mochi Edition</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Varela+Round&family=M+PLUS+Rounded+1c:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: fixed;
+        overscroll-behavior: none;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        background-color: #87ceeb;
+      }
+
+      #root {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* GPU Acceleration */
+      .gpu-layer {
+        will-change: transform, opacity;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+      }
+
+      /* 粘土らしい微細な震え（控えめに） */
+      @keyframes clay-wobble {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.01, 0.99);
+        }
+      }
+      .animate-wobble {
+        animation: clay-wobble 3s ease-in-out infinite;
+      }
+
+      /* 爆速「もちもち」着地 */
+      @keyframes super-mochi-land {
+        0% {
+          transform: scale(0.95, 1.1) translateY(-5px);
+        }
+        40% {
+          transform: scale(1.15, 0.85) translateY(2px);
+        }
+        100% {
+          transform: scale(1, 1) translateY(0);
+        }
+      }
+      .animate-land {
+        animation: super-mochi-land 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+      }
+
+      /* 消去時の「ぷしゅっ」 */
+      @keyframes mochi-burst {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.5);
+          opacity: 0;
+          filter: blur(10px);
+        }
+      }
+      .animate-clear {
+        animation: mochi-burst 0.25s ease-out forwards;
+      }
+
+      /* コンボテキスト */
+      @keyframes combo-pop {
+        0% {
+          transform: translate(-50%, 0px) scale(0);
+          opacity: 0;
+        }
+        20% {
+          transform: translate(-50%, -20px) scale(1.2);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -60px) scale(1);
+          opacity: 0;
+        }
+      }
+      .combo-text {
+        position: absolute;
+        pointer-events: none;
+        animation: combo-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+        z-index: 100;
+        text-shadow: 0 4px 0px rgba(0, 0, 0, 0.2);
+        font-family: "M PLUS Rounded 1c", sans-serif;
+      }
+
+      .clay-texture::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
+        opacity: 0.05;
+        pointer-events: none;
+        mix-blend-mode: multiply;
+      }
+
+      /* 画面シェイクアニメーション */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-4px) translateY(2px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(4px) translateY(-2px);
+        }
+      }
+      .animate-shake {
+        animation: shake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      }
+
+      /* フェードインアニメーション */
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .animate-fade-in {
+        animation: fade-in 0.4s ease-out forwards;
+      }
+
+      /* レインボースピン */
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .animate-spin-slow {
+        animation: spin 3s linear infinite;
+      }
+
+      /* 緊急アラート */
+      @keyframes pulse-red {
+        0%, 100% { box-shadow: inset 0 0 0 0px rgba(255, 0, 0, 0); }
+        50% { box-shadow: inset 0 0 50px 20px rgba(255, 0, 0, 0.5); }
+      }
+      .animate-pulse-red {
+        animation: pulse-red 0.5s ease-in-out infinite;
+      }
+      /* Bouncy/Jelly Animations */
+      @keyframes jelly {
+        0%, 100% { transform: scale(1, 1); }
+        25% { transform: scale(0.9, 1.1); }
+        50% { transform: scale(1.1, 0.9); }
+        75% { transform: scale(0.95, 1.05); }
+      }
+      @keyframes poyon {
+        0%, 100% { transform: translateY(0) scale(1); }
+        30% { transform: translateY(-10px) scale(1.05); }
+        50% { transform: translateY(0) scale(0.95); }
+        70% { transform: translateY(-5px) scale(1.02); }
+      }
+      .animate-jelly {
+        animation: jelly 2s infinite ease-in-out;
+      }
+      .animate-poyon {
+        animation: poyon 2s infinite ease-in-out;
+      }
+      .animate-poyon-delay {
+        animation: poyon 2s infinite ease-in-out 1s;
+      }
+      .text-shadow-outline {
+        text-shadow: 
+           3px 3px 0px rgba(0,0,0,0.15), 
+          -2px -2px 0 rgba(255,255,255,0.2),
+           0 0 10px rgba(255,255,255,0.4);
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+      .animate-float {
+        animation: float 3s ease-in-out infinite;
+      }
+
+      /* SPECIAL DONUT EFFECTS - ENHANCED */
+      @keyframes shine-gold {
+        0% { 
+          filter: brightness(1) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); 
+        }
+        50% { 
+          filter: brightness(1.4) drop-shadow(0 0 25px rgba(255, 200, 0, 1)) drop-shadow(0 0 40px rgba(255, 180, 0, 0.6)); 
+        }
+        100% { 
+          filter: brightness(1) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); 
+        }
+      }
+      .effect-gold {
+        animation: shine-gold 1.5s infinite ease-in-out;
+      }
+
+      @keyframes shine-silver {
+        0% { 
+          filter: brightness(1.1) drop-shadow(0 0 8px rgba(200, 200, 255, 0.5)); 
+        }
+        50% { 
+          filter: brightness(1.5) drop-shadow(0 0 30px rgba(255, 255, 255, 1)) drop-shadow(0 0 50px rgba(200, 220, 255, 0.7)); 
+        }
+        100% { 
+          filter: brightness(1.1) drop-shadow(0 0 8px rgba(200, 200, 255, 0.5)); 
+        }
+      }
+      .effect-silver {
+        animation: shine-silver 2s infinite ease-in-out;
+      }
+
+      @keyframes rainbow-pulse {
+        0% { 
+          filter: brightness(1.1) drop-shadow(0 0 10px rgba(255, 0, 100, 0.7)) hue-rotate(0deg); 
+          transform: scale(1); 
+        }
+        33% { 
+          filter: brightness(1.2) drop-shadow(0 0 20px rgba(100, 255, 0, 0.8)) hue-rotate(120deg); 
+          transform: scale(1.03); 
+        }
+        66% { 
+          filter: brightness(1.2) drop-shadow(0 0 20px rgba(0, 100, 255, 0.8)) hue-rotate(240deg); 
+          transform: scale(1.03); 
+        }
+        100% { 
+          filter: brightness(1.1) drop-shadow(0 0 10px rgba(255, 0, 100, 0.7)) hue-rotate(360deg); 
+          transform: scale(1); 
+        }
+      }
+      .effect-rainbow {
+        animation: rainbow-pulse 2s infinite linear;
+      }
+
+      /* Sparkle overlay animation */
+      @keyframes sparkle-rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .sparkle-overlay {
+        animation: sparkle-rotate 4s linear infinite;
+      }
+      
+      @keyframes twinkle {
+        0%, 100% { opacity: 0.3; transform: scale(0.8); }
+        50% { opacity: 1; transform: scale(1.2); }
+      }
+      .twinkle {
+        animation: twinkle 0.8s infinite ease-in-out;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+          "uuid": "https://esm.sh/uuid@^13.0.0",
+          "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+          "react/": "https://esm.sh/react@^19.2.4/",
+          "react": "https://esm.sh/react@^19.2.4"
+        }
+      }
+    </script>
+
+  </head>
+  <body class="clay-texture">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

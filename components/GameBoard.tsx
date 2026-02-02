@@ -217,11 +217,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         const centerCol = matchedCells.reduce((sum, c) => sum + c.col, 0) / matchedCells.length;
         const cellSize = 100 / GRID_SIZE;
         
-        // 各セルに中央へ向かうオフセットを設定
+        // 各セルに中央へ向かうオフセットを設定（ピクセル単位）
         workingGrid = workingGrid.map(cell => {
           if (finalMatchedIds.has(cell.id)) {
-            const offsetX = (centerCol - cell.col) * cellSize * 0.4; // 40%だけ中央に寄る
-            const offsetY = (centerRow - cell.row) * cellSize * 0.4;
+            // 中央に向かって70%移動
+            const offsetX = (centerCol - cell.col) * 70;
+            const offsetY = (centerRow - cell.row) * 70;
             return { ...cell, isMatched: true, mergeOffset: { x: offsetX, y: offsetY } };
           }
           return { ...cell, mergeOffset: undefined };
@@ -262,8 +263,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         setTimeout(() => setComboTexts(prev => prev.filter(t => t.id !== cid)), 500);
       }
 
-      // アニメーション時間を確保（集合 → 消滅）
-      await new Promise(r => setTimeout(r, 250));
+      // マージアニメーション時間を確保
+      await new Promise(r => setTimeout(r, 300));
 
       const bombCells = new Set<string>();
       const newGridState = [...workingGrid];
@@ -612,8 +613,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         if (isDragging && dragOffset) {
           dragTransform = `translate3d(${dragOffset.x}px, ${dragOffset.y}px, 0)`;
         } else if (hasMergeOffset) {
-          // ぷよぷよ風: 中央に集まるアニメーション
-          dragTransform = `translate(${cell.mergeOffset!.x}%, ${cell.mergeOffset!.y}%) scale(1.2)`;
+          // ぷよぷよ風: 中央に集まって膨らむ
+          dragTransform = `translate(${cell.mergeOffset!.x}px, ${cell.mergeOffset!.y}px) scale(1.3)`;
         } else if (isSelected) {
           dragTransform = 'scale(1.1) translate3d(0,-8px,0)';
         } else {
@@ -630,10 +631,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               left: `${cell.col * cellSize}%`,
               top: `${cell.visualRow * cellSize}%`,
               transition: hasMergeOffset 
-                ? 'transform 0.15s ease-out, opacity 0.15s ease-out' 
+                ? 'transform 0.25s ease-out, opacity 0.2s ease-out 0.15s' 
                 : (isDragging ? 'none' : (isProcessing ? 'top 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.15s ease-in-out' : 'none')),
               zIndex: isSelected || hasMergeOffset ? 100 : 10,
-              opacity: cell.isMatched ? (hasMergeOffset ? 0.8 : 0) : 1,
+              opacity: cell.isMatched ? (hasMergeOffset ? 1 : 0) : 1,
               transform: dragTransform,
               willChange: isDragging || hasMergeOffset ? 'transform, opacity' : 'auto',
               cursor: isDragging ? 'grabbing' : 'grab',

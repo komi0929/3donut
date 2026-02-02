@@ -489,14 +489,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     processBoard(afterFallGrid);
   };
 
-  // Continuous Drag Logic
+  // Simplified Touch Logic
   const handlePointerDown = (e: React.PointerEvent, r: number, c: number) => {
-    // Allow interaction even during settling, but maybe not during big explosions if critical
-    // For "crisp" feel, we try to allow it.
     if (!isInteractable) return;
-    
-    const target = e.currentTarget as HTMLElement;
-    target.setPointerCapture(e.pointerId); 
+    e.preventDefault(); // タッチスクロール防止
     
     setSelectedPos({ row: r, col: c });
     dragRef.current = { startR: r, startC: c, startX: e.clientX, startY: e.clientY };
@@ -572,7 +568,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const cellSize = 100 / GRID_SIZE;
 
   return (
-    <div className="relative w-full max-w-[min(90vw,500px)] aspect-square bg-[#FFE4C4]/60 rounded-[2.5rem] p-3 shadow-2xl border-[8px] border-white overflow-hidden mx-auto touch-none select-none"
+    <div className="relative w-full max-w-[min(90vw,500px)] aspect-square bg-[#FFE4C4]/60 rounded-[2.5rem] p-3 shadow-2xl border-[8px] border-white overflow-hidden mx-auto select-none"
          onPointerMove={handlePointerMove}
          onPointerUp={handlePointerUp} 
          onPointerLeave={() => { 

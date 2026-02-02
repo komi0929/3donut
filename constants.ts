@@ -1,4 +1,4 @@
-export const GRID_SIZE = 7;
+export const GRID_SIZE = 6;
 export const TARGET_CLEARS = 50;
 export const TIME_LIMIT = 30;
 

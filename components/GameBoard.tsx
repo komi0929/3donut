@@ -538,63 +538,35 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!dragRef.current) return;
-    // NOTE: Removed isProcessing check to allow "queueing" or "continuous input" feeling
-    // Ideally we should block *only* if the board is falling, but for now let's try maximum responsiveness
-    // If user creates a match, handleSwap will trigger processBoard -> isProcessing=true
     
     const { startR, startC, startX, startY } = dragRef.current;
-    
     const moveX = e.clientX - startX;
     const moveY = e.clientY - startY;
     
-    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    animationFrameRef.current = requestAnimationFrame(() => {
-      setDragOffset({ x: moveX, y: moveY });
-    });
+    // 即座にオフセット更新（animationFrame削除で高速化）
+    setDragOffset({ x: moveX, y: moveY });
     
-    // Dynamic threshold based on cell size
-    // モバイル優先: 低い閾値で素早く反応
-    const containerWidth = Math.min(window.innerWidth * 0.9, 500);
-    const cellPx = containerWidth / GRID_SIZE;
-    const swapThreshold = Math.max(15, cellPx * 0.25); // 15px最小、セル幅の25% 
+    // 超低閾値: 10px で即座にスワップ
+    const swapThreshold = 10;
     
     if (Math.abs(moveX) > swapThreshold || Math.abs(moveY) > swapThreshold) {
       let tr = startR, tc = startC;
       
-      // Determine direction
       if (Math.abs(moveX) > Math.abs(moveY)) {
-          tc = moveX > 0 ? startC + 1 : startC - 1;
+        tc = moveX > 0 ? startC + 1 : startC - 1;
       } else {
-          tr = moveY > 0 ? startR + 1 : startR - 1;
+        tr = moveY > 0 ? startR + 1 : startR - 1;
       }
 
       if (tr >= 0 && tr < GRID_SIZE && tc >= 0 && tc < GRID_SIZE) {
-        // CONTINUOUS DRAG IMPL:
-        // Instead of resetting dragRef, we UPDATE it to the new cell's position.
-        // This simulates "finger still down, now managing the new cell".
-        
-        // 1. Execute Swap
+        // 即座にスワップ実行
         handleSwap(startR, startC, tr, tc);
         
-        // 2. Update Ref to track from the NEW geometric center (approximate)
-        // actually we just shift the startX/Y so the dragOffset resets effectively relative to new cell
-        // New startR/C becomes the cell we just moved TO (which is now occupied by our original donut)
-        // Wait... after swap, does (tr, tc) contain the original donut? 
-        // handleSwap swaps grid data. So grid[tr][tc] is now the donut we started with.
-        
-        dragRef.current = { 
-            startR: tr, 
-            startC: tc, 
-            startX: e.clientX, 
-            startY: e.clientY 
-        };
-        
-        // 3. Reset visual offset because we logically moved the base pointer
-        setDragOffset({ x: 0, y: 0 });
-        setSelectedPos({ row: tr, col: tc }); // Update highlighting to follow the donut
-        
-        // Prevent Tap detection after a move
+        // ドラッグ終了（連続ドラッグを無効化してシンプルに）
+        dragRef.current = null;
         tapRef.current = null;
+        setDragOffset(null);
+        setSelectedPos(null);
       }
     }
   };

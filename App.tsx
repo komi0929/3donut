@@ -14,6 +14,8 @@ const App: React.FC = () => {
   const [assets, setAssets] = useState<Record<string, string>>({});
   const [clearedCount, setClearedCount] = useState(0);
   const [isShaking, setIsShaking] = useState(false);
+  const [showRanking, setShowRanking] = useState(false);
+  const [rankingTab, setRankingTab] = useState<'weekly' | 'hallOfFame'>('weekly');
   
   // Fever state
   const [feverValue, setFeverValue] = useState(0);
@@ -75,7 +77,12 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const preventDefault = (e: TouchEvent) => {
-      if ((e.target as HTMLElement).tagName !== 'BUTTON') {
+      const target = e.target as HTMLElement;
+      // Scrollable areas should allow touchmove
+      // Check if target is inside a scrollable container (custom-scrollbar or overflow-y-auto)
+      const isScrollable = target.closest('.custom-scrollbar') || target.closest('.overflow-y-auto');
+      
+      if (target.tagName !== 'BUTTON' && !isScrollable) {
         e.preventDefault();
       }
     };
@@ -184,6 +191,24 @@ const App: React.FC = () => {
             >
                 <Play className="w-10 h-10 mr-2" fill="white" />
                 START
+            </button>
+        </div>
+
+        {/* TOP Page Actions: Ranking & Hall of Fame */}
+        <div className="w-full px-12 pt-4 pointer-events-auto flex flex-col gap-3 items-center">
+            <button
+                onClick={() => { setRankingTab('weekly'); setShowRanking(true); }}
+                className="btn-clay btn-clay-soda w-full max-w-[260px] text-lg py-3 flex items-center justify-center gap-2"
+            >
+                <Trophy className="w-5 h-5" />
+                <span>今週のランキング</span>
+            </button>
+            <button
+                onClick={() => { setRankingTab('hallOfFame'); setShowRanking(true); }}
+                className="btn-clay btn-clay-orange w-full max-w-[260px] text-lg py-3 flex items-center justify-center gap-2"
+            >
+                <Medal className="w-5 h-5" />
+                <span>殿堂入り</span>
             </button>
         </div>
     </div>
@@ -302,6 +327,15 @@ const App: React.FC = () => {
       {/* WIN -> Ranking Display */}
       {gameState === GameState.WIN && (
           <Ranking finalTime={finalTime} onRetry={startGame} onHome={() => setGameState(GameState.INIT)} />
+      )}
+      
+      {/* Top Page Ranking Modal */}
+      {showRanking && (
+          <Ranking 
+            initialTab={rankingTab} 
+            onRetry={() => {}} // Not used in read-only
+            onHome={() => setShowRanking(false)} 
+          />
       )}
 
       {/* Footer */}

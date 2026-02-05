@@ -123,21 +123,21 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
             {/* Header Icon */}
             <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-20">
                 {activeTab === 'hallOfFame' ? (
-                     <img src="/ui_icon_trophy.png" alt="Hall of Fame" className="w-24 h-24 drop-shadow-2xl animate-poyon grayscale-0" style={{ filter: 'hue-rotate(-30deg) saturate(1.5)' }} />
+                     <img src="/ui_icon_rank_medal.png" alt="Hall of Fame" className="w-28 h-28 drop-shadow-2xl animate-poyon object-contain" />
                 ) : (
                     loading ? (
                         <div className="text-6xl animate-bounce drop-shadow-lg opacity-80">🤔</div>
                     ) : isRankIn ? (
-                        <img src="/ui_icon_trophy.png" alt="" className="w-24 h-24 drop-shadow-2xl animate-poyon" />
+                        <img src="/ui_icon_rank_trophy.png" alt="Rank In" className="w-28 h-28 drop-shadow-2xl animate-poyon object-contain" />
                     ) : isReadOnly ? (
-                        <Trophy className="w-20 h-20 text-white drop-shadow-lg" strokeWidth={1.5} />
+                        <img src="/ui_icon_rank_trophy.png" alt="Ranking" className="w-24 h-24 drop-shadow-2xl object-contain" />
                     ) : (
                         <div className="text-6xl animate-bounce drop-shadow-lg grayscale opacity-80">😢</div>
                     )
                 )}
             </div>
             
-            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-16 pb-6 mt-4">
+            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-20 pb-6 mt-4">
                 
                 {/* Result Display (Only in Game Over context and Weekly tab) */}
                 {!isReadOnly && activeTab === 'weekly' && (
@@ -222,7 +222,7 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                                 hallOfFame.map((entry, index) => (
                                     <div key={index} className="flex items-center justify-center p-3 rounded-lg bg-gradient-to-r from-yellow-50 to-white border border-yellow-100 mb-2">
                                         <div className="flex items-center gap-2">
-                                            <Medal className="w-5 h-5 text-[#FFD700]" />
+                                            <img src="/ui_icon_rank_medal.png" alt="Medal" className="w-8 h-8 object-contain" />
                                             <span className="font-black text-[#8D6E63] text-lg">{entry.player_name}</span>
                                         </div>
                                     </div>
@@ -235,13 +235,13 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                 {/* Footer Actions */}
                 <div className="px-6 space-y-3">
                     {!isReadOnly && (
-                        <button onClick={onRetry} className="btn-clay btn-clay-orange w-full text-xl py-4 flex items-center justify-center gap-2">
+                        <button onClick={onRetry} className="btn-clay btn-clay-orange w-full text-xl py-4 flex items-center justify-center gap-2 shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
                             <RotateCcw className="w-6 h-6" strokeWidth={3} />
-                            <span>もう一度</span>
+                            <span>もう一度遊ぶ！</span>
                         </button>
                     )}
                     
-                    <button onClick={handleGoHome} className="btn-clay btn-clay-vanilla w-full text-gray-500 text-lg py-3 flex items-center justify-center gap-2 border-2 border-transparent hover:border-gray-200">
+                    <button onClick={handleGoHome} className="btn-clay btn-clay-vanilla w-full text-gray-500 text-lg py-3 flex items-center justify-center gap-2 border-2 border-transparent hover:border-gray-200 shadow-lg active:scale-95 transition-all">
                         <Home className="w-5 h-5" />
                         <span>{isReadOnly ? '閉じる' : 'TOPに戻る'}</span>
                     </button>

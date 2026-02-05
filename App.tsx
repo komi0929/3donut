@@ -306,7 +306,7 @@ const App: React.FC = () => {
                               className="btn-clay btn-clay-orange w-full text-xl py-4 flex items-center justify-center gap-2"
                           >
                               <RotateCcw className="w-6 h-6" strokeWidth={3} />
-                              <span>もう一度</span>
+                              <span>もう一度遊ぶ！</span>
                           </button>
                           
                           {/* Home Button */}

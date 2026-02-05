@@ -145,7 +145,7 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                 )}
             </div>
             
-            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-32 pb-6 mt-12">
+            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-48 pb-6 mt-12">
                 
                 {/* Result Display (Only in Game Over context and Weekly tab) */}
                 {!isReadOnly && activeTab === 'weekly' && (
@@ -197,7 +197,7 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
 
                 {/* List Display */}
                 <div className="mx-6 mb-6">
-                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto p-4 custom-scrollbar">
                         {loading ? (
                             <div className="text-center py-4 text-gray-400 animate-pulse font-bold">読み込み中...</div>
                         ) : activeTab === 'weekly' ? (

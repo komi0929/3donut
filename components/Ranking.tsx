@@ -97,7 +97,10 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
         {!isReadOnly && activeTab === 'weekly' ? null : (
             <div className="absolute top-24 z-30 flex gap-2">
                 <button
-                    onClick={() => setActiveTab('weekly')}
+                    onClick={() => {
+                        setLoading(true);
+                        setActiveTab('weekly');
+                    }}
                     className={`px-6 py-2 rounded-full font-black text-sm border-2 transition-transform active:scale-95 ${
                         activeTab === 'weekly' 
                         ? 'bg-white text-[#5BB5E0] border-white shadow-lg' 
@@ -107,7 +110,10 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                     今週のランキング
                 </button>
                 <button
-                    onClick={() => setActiveTab('hallOfFame')}
+                    onClick={() => {
+                        setLoading(true);
+                        setActiveTab('hallOfFame');
+                    }}
                     className={`px-6 py-2 rounded-full font-black text-sm border-2 transition-transform active:scale-95 ${
                         activeTab === 'hallOfFame' 
                         ? 'bg-white text-[#FFD700] border-white shadow-lg' 
@@ -126,7 +132,9 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                      <img src="/ui_icon_rank_medal.png" alt="Hall of Fame" className="w-28 h-28 drop-shadow-2xl animate-poyon object-contain" />
                 ) : (
                     loading ? (
-                        <div className="text-6xl animate-bounce drop-shadow-lg opacity-80">🤔</div>
+                        <div className="w-24 h-24 flex items-center justify-center">
+                            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
                     ) : isRankIn ? (
                         <img src="/ui_icon_rank_trophy.png" alt="Rank In" className="w-28 h-28 drop-shadow-2xl animate-poyon object-contain" />
                     ) : isReadOnly ? (

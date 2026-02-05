@@ -127,25 +127,25 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
 
         <div className="relative w-full max-w-sm mt-12">
             {/* Header Icon */}
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-20">
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 z-20">
                 {activeTab === 'hallOfFame' ? (
-                     <img src="/ui_icon_rank_medal.png" alt="Hall of Fame" className="w-28 h-28 drop-shadow-2xl animate-poyon object-contain" />
+                     <img src="/ui_icon_rank_medal.png" alt="Hall of Fame" className="w-56 h-56 drop-shadow-2xl animate-poyon object-contain" />
                 ) : (
                     loading ? (
-                        <div className="w-24 h-24 flex items-center justify-center">
+                        <div className="w-56 h-56 flex items-center justify-center">
                             <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     ) : isRankIn ? (
-                        <img src="/ui_icon_rank_trophy.png" alt="Rank In" className="w-28 h-28 drop-shadow-2xl animate-poyon object-contain" />
+                        <img src="/ui_icon_rank_trophy.png" alt="Rank In" className="w-56 h-56 drop-shadow-2xl animate-poyon object-contain" />
                     ) : isReadOnly ? (
-                        <img src="/ui_icon_rank_trophy.png" alt="Ranking" className="w-24 h-24 drop-shadow-2xl object-contain" />
+                        <img src="/ui_icon_rank_trophy.png" alt="Ranking" className="w-48 h-48 drop-shadow-2xl object-contain" />
                     ) : (
                         <div className="text-6xl animate-bounce drop-shadow-lg grayscale opacity-80">😢</div>
                     )
                 )}
             </div>
             
-            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-20 pb-6 mt-4">
+            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-32 pb-6 mt-12">
                 
                 {/* Result Display (Only in Game Over context and Weekly tab) */}
                 {!isReadOnly && activeTab === 'weekly' && (
@@ -197,12 +197,7 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
 
                 {/* List Display */}
                 <div className="mx-6 mb-6">
-                    <div className="text-center mb-2">
-                        <h3 className="font-black text-[#8D6E63] text-sm tracking-widest opacity-50 uppercase">
-                            {activeTab === 'weekly' ? 'WEEKLY RANKING' : 'HALL OF FAME'}
-                        </h3>
-                    </div>
-                    <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                         {loading ? (
                             <div className="text-center py-4 text-gray-400 animate-pulse font-bold">読み込み中...</div>
                         ) : activeTab === 'weekly' ? (
@@ -211,13 +206,44 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                             ) : (
                                 leaderboard.slice(0, 50).map((entry, index) => { // Top 50 is fine
                                     const isMyEntry = !isReadOnly && submitted && entry.player_name === playerName && finalTime && Math.abs(entry.clear_time - finalTime) < 0.01;
+                                    
+                                    // Rich Design for Top 3
+                                    let rankStyle = '';
+                                    let rankIcon = null;
+                                    let rankBadgeColor = 'bg-gray-200 text-gray-600';
+                                    
+                                    if (index === 0) {
+                                        rankStyle = 'bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-[#FFD700] shadow-lg transform scale-[1.02] z-10';
+                                        rankBadgeColor = 'bg-[#FFD700] text-white shadow-md ring-2 ring-yellow-200';
+                                        rankIcon = <img src="/ui_icon_crown.png" className="w-5 h-5 absolute -top-2 -left-2 animate-bounce" alt="Crown" />;
+                                    } else if (index === 1) {
+                                        rankStyle = 'bg-white border-2 border-gray-300 shadow-md';
+                                        rankBadgeColor = 'bg-gray-300 text-white shadow-sm';
+                                    } else if (index === 2) {
+                                        rankStyle = 'bg-white border-2 border-orange-200 shadow-md';
+                                        rankBadgeColor = 'bg-[#CD7F32] text-white shadow-sm';
+                                    } else {
+                                        rankStyle = 'bg-white border border-transparent hover:bg-gray-50';
+                                    }
+
+                                    if (isMyEntry) {
+                                        rankStyle = 'bg-[#FFF9C4] border-2 border-[#FFD700] scale-105 shadow-xl relative z-20';
+                                    }
+
                                     return (
-                                        <div key={index} className={`flex items-center justify-between p-2 rounded-lg transition-all duration-500 ${isMyEntry ? 'bg-[#FFF9C4] border-2 border-[#FFD700] scale-105 shadow-md' : 'bg-gray-50 border border-transparent'}`}>
-                                            <div className="flex items-center gap-2">
-                                                <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-black shrink-0 ${index < 3 ? 'bg-[#FFD700] text-white' : 'bg-gray-200 text-gray-600'}`}>{index + 1}</span>
-                                                <span className="font-bold text-gray-700 text-sm truncate max-w-[120px]">{entry.player_name}</span>
+                                        <div key={index} className={`relative flex items-center justify-between p-3 rounded-xl transition-all duration-300 mb-1 ${rankStyle}`}>
+                                            {rankIcon}
+                                            <div className="flex items-center gap-3">
+                                                <span className={`w-8 h-8 flex items-center justify-center rounded-full text-base font-black shrink-0 ${rankBadgeColor}`}>
+                                                    {index + 1}
+                                                </span>
+                                                <span className={`font-bold text-sm truncate max-w-[120px] ${index < 3 ? 'text-[#5D4037] text-base' : 'text-gray-700'}`}>
+                                                    {entry.player_name}
+                                                </span>
                                             </div>
-                                            <span className="font-mono font-bold text-[#5BB5E0] text-sm whitespace-nowrap">{entry.clear_time.toFixed(1)}s</span>
+                                            <span className={`font-mono font-black text-sm whitespace-nowrap ${index < 3 ? 'text-[#FF8C00] text-lg' : 'text-[#5BB5E0]'}`}>
+                                                {entry.clear_time.toFixed(1)}s
+                                            </span>
                                         </div>
                                     );
                                 })

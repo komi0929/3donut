@@ -164,7 +164,7 @@ const App: React.FC = () => {
   }, []);
 
   const renderInit = () => (
-    <div className="flex flex-col items-center justify-center h-full pb-32 pt-20 text-center animate-fade-in relative z-10 w-full max-w-md mx-auto select-none pointer-events-none">
+    <div className="flex flex-col items-center justify-center h-full pb-48 pt-20 text-center animate-fade-in relative z-10 w-full max-w-md mx-auto select-none pointer-events-none">
         
         {/* HERO SECTION: Logo & Title */}
         <div className="flex-1 flex flex-col justify-center items-center w-full min-h-[40vh]">

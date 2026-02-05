@@ -93,41 +93,41 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
          style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #E0F4FF 100%)' }}>
         <style>{customStyles}</style>
 
-        {/* Tab Switcher (Only visible in ReadOnly mode or if desired, users can switch to Hall of Fame after game too) */}
-        {!isReadOnly && activeTab === 'weekly' ? null : (
-            <div className="absolute top-24 z-30 flex gap-2">
-                <button
-                    onClick={() => {
-                        setLoading(true);
-                        setActiveTab('weekly');
-                    }}
-                    className={`px-6 py-2 rounded-full font-black text-sm border-2 transition-transform active:scale-95 ${
-                        activeTab === 'weekly' 
-                        ? 'bg-white text-[#5BB5E0] border-white shadow-lg' 
-                        : 'bg-[#5BB5E0] text-white border-white/50 opacity-80'
-                    }`}
-                >
-                    今週のランキング
-                </button>
-                <button
-                    onClick={() => {
-                        setLoading(true);
-                        setActiveTab('hallOfFame');
-                    }}
-                    className={`px-6 py-2 rounded-full font-black text-sm border-2 transition-transform active:scale-95 ${
-                        activeTab === 'hallOfFame' 
-                        ? 'bg-white text-[#FFD700] border-white shadow-lg' 
-                        : 'bg-[#FFD700] text-white border-white/50 opacity-80'
-                    }`}
-                >
-                    殿堂入り
-                </button>
-            </div>
-        )}
+        <div className="relative w-full max-w-sm mt-24">
+            {/* Tab Switcher */}
+            {!isReadOnly && (
+                <div className="absolute -top-28 left-0 right-0 flex justify-center gap-4 z-10">
+                    <button
+                        onClick={() => {
+                            setLoading(true);
+                            setActiveTab('weekly');
+                        }}
+                        className={`px-4 py-2 rounded-full font-black text-xs border-2 transition-transform active:scale-95 ${
+                            activeTab === 'weekly' 
+                            ? 'bg-white text-[#5BB5E0] border-white shadow-lg scale-110' 
+                            : 'bg-[#5BB5E0] text-white border-white/50 opacity-80'
+                        }`}
+                    >
+                        今週のランキング
+                    </button>
+                    <button
+                        onClick={() => {
+                            setLoading(true);
+                            setActiveTab('hallOfFame');
+                        }}
+                        className={`px-4 py-2 rounded-full font-black text-xs border-2 transition-transform active:scale-95 ${
+                            activeTab === 'hallOfFame' 
+                            ? 'bg-white text-[#FFD700] border-white shadow-lg scale-110' 
+                            : 'bg-[#FFD700] text-white border-white/50 opacity-80'
+                        }`}
+                    >
+                        殿堂入り
+                    </button>
+                </div>
+            )}
 
-        <div className="relative w-full max-w-sm mt-12">
             {/* Header Icon */}
-            <div className="absolute -top-20 left-1/2 -translate-x-1/2 z-20">
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
                 {activeTab === 'hallOfFame' ? (
                      <img src="/ui_icon_rank_medal.png" alt="Hall of Fame" className="w-56 h-56 drop-shadow-2xl animate-poyon object-contain" />
                 ) : (
@@ -145,7 +145,7 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                 )}
             </div>
             
-            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-48 pb-6 mt-12">
+            <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white pt-36 pb-6 mt-4">
                 
                 {/* Result Display (Only in Game Over context and Weekly tab) */}
                 {!isReadOnly && activeTab === 'weekly' && (

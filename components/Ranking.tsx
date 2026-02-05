@@ -89,9 +89,11 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center p-4 animate-fade-in"
+    <div className="absolute inset-0 z-50 overflow-y-auto custom-scrollbar animate-fade-in"
          style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #E0F4FF 100%)' }}>
         <style>{customStyles}</style>
+
+        <div className="min-h-full flex flex-col items-center justify-center p-4 py-20">
 
         <div className="relative w-full max-w-sm mt-24">
             {/* Tab Switcher */}
@@ -282,6 +284,7 @@ export const Ranking: React.FC<RankingProps> = ({ finalTime, onRetry, onHome, in
                 </div>
             </div>
         </div>
+    </div>
     </div>
   );
 };
